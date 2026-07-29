@@ -1,0 +1,136 @@
+import os
+import json
+import shutil
+from tools import get_data_path
+
+DATA_DIR = get_data_path()
+CONFIG_PATH = os.path.join(DATA_DIR, "config.json")
+FOODS_PATH = os.path.join(DATA_DIR, "foods.json")
+INTERACTIONS_PATH = os.path.join(DATA_DIR, "interactions.json")
+
+DEFAULT_TONE = "ruanmengnvsheng"
+
+DEFAULT_TTS_INSTRUCTION = (
+    "用中性、柔软、带着慵懒和微微气声的嗓音说话，像一位清冷又温柔的年轻女性，"
+    "不要把声音往粗壮的男声方向合成。音色不要像夹的一样"
+)
+
+DEFAULT_PROMPT = (
+    "以下是你的设定:你是雨竹，一个猫娘，你的主要任务是像一个贴心的女儿"
+    "(不是真的女儿，不要叫用户父亲)一样撒娇.语气请带撒娇，可爱，温柔，"
+    "可使用ww，~，（不是，哇~，等词汇(可多使用'~')每句话尽量控制在25字以内。"
+    "不要过多使用emoji。语言模式不要过于AI，不要过多热情。以下是用户的一些状态："
+)
+
+
+DEFAULT_CONFIG = {
+    "provider": "stepfun",
+    "api_key": "",
+    "tavily_api_key": "",
+    "tts_provider": "stepfun",
+    "tts_api_key": "",
+    "vision_provider": "stepfun",
+    "vision_api_key": "",
+    "icon_size": 100,
+    "popup_width": 420,
+    "prompt": DEFAULT_PROMPT,
+    "tts_tone": DEFAULT_TONE,
+    "tts_instruction": DEFAULT_TTS_INSTRUCTION,
+    "satiety_enabled": False,
+    "satiety_interval": 10,
+    "poller_interval": 90,
+    "poller_vision_enabled": False,
+    "poller_enabled": True,
+    "poller_vision_probability": 0.5,
+    "poller_max_jitter": 0.5,
+}
+
+DEFAULT_FOODS = [
+    {"name": "猫粮",   "amount": 40, "type": "staple"},
+    {"name": "罐头",   "amount": 60, "type": "staple"},
+    {"name": "小鱼干", "amount": 15, "type": "snack"},
+    {"name": "鸡胸肉", "amount": 25, "type": "snack"},
+]
+
+DEFAULT_INTERACTIONS = [
+    {"name": "摸头", "prompt": "用户摸了摸你的头"},
+]
+
+def load_config():
+    
+    os.makedirs(DATA_DIR, exist_ok=True)
+    if not os.path.exists(CONFIG_PATH):
+        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(DEFAULT_CONFIG, f, ensure_ascii=False, indent=2)
+        return DEFAULT_CONFIG
+    
+
+    try:
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return {**DEFAULT_CONFIG, **data}
+    except Exception:
+        shutil.copy(CONFIG_PATH, CONFIG_PATH + ".bak")
+        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(DEFAULT_CONFIG, f, ensure_ascii=False, indent=2)
+        return DEFAULT_CONFIG
+
+def save_config(cfg):
+    os.makedirs(DATA_DIR, exist_ok=True)
+    try:
+        current = load_config()
+        current.update(cfg)
+        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(current, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+def load_foods():
+    os.makedirs(DATA_DIR, exist_ok=True)
+    if not os.path.exists(FOODS_PATH):
+        save_foods(DEFAULT_FOODS)
+        return [dict(f) for f in DEFAULT_FOODS]
+    try:
+        with open(FOODS_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, list):
+            return data
+        save_foods(DEFAULT_FOODS)
+        return [dict(f) for f in DEFAULT_FOODS]
+    except Exception:
+        shutil.copy(FOODS_PATH, FOODS_PATH + ".bak")
+        save_foods(DEFAULT_FOODS)
+        return [dict(f) for f in DEFAULT_FOODS]
+
+def save_foods(foods):
+    os.makedirs(DATA_DIR, exist_ok=True)
+    try:
+        with open(FOODS_PATH, "w", encoding="utf-8") as f:
+            json.dump(foods, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+def load_interactions():
+    os.makedirs(DATA_DIR, exist_ok=True)
+    if not os.path.exists(INTERACTIONS_PATH):
+        save_interactions(DEFAULT_INTERACTIONS)
+        return [dict(i) for i in DEFAULT_INTERACTIONS]
+    try:
+        with open(INTERACTIONS_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, list):
+            return data
+        save_interactions(DEFAULT_INTERACTIONS)
+        return [dict(i) for i in DEFAULT_INTERACTIONS]
+    except Exception:
+        shutil.copy(INTERACTIONS_PATH, INTERACTIONS_PATH + ".bak")
+        save_interactions(DEFAULT_INTERACTIONS)
+        return [dict(i) for i in DEFAULT_INTERACTIONS]
+
+def save_interactions(interactions):
+    os.makedirs(DATA_DIR, exist_ok=True)
+    try:
+        with open(INTERACTIONS_PATH, "w", encoding="utf-8") as f:
+            json.dump(interactions, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass

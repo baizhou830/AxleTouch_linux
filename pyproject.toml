@@ -1,0 +1,20 @@
+[project]
+name = "axle-touch-linux"
+version = "0.1.0"
+description = "一个轻量化桌宠（Linux 版）"
+license = "GPL-3.0-only"
+requires-python = ">=3.12"
+dependencies = [
+    "PyQt5>=5.15",
+    "requests>=2.28",
+]
+
+[project.scripts]
+axle-touch = "main:main"
+
+[dependency-groups]
+dev = ["pyinstaller"]
+
+[[tool.uv.index]]
+url = "https://pypi.mirrors.ustc.edu.cn/simple/"
+default = true
